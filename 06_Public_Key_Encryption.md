@@ -113,3 +113,36 @@ H(.):
 - un piccolo cambiamento nel documento produce un così grande cambiamento che i due hash paiono non avere nulla in comune
 
 **Crittografia a chiave pubblica con TDFs:**
+- ($G, F, F^{-1}$) un TDF sicuro $X \rightarrow Y$
+- ($E_{S}, D_{S}$) una cifratura simmetrica autenticata definita su (K, M, C)
+- ($H : X \rightarrow K$) una one-way hash function
+
+Dobbiamo costruire un sistema di cifratura a chiave pubblica (G, E, D), dove G() genera una coppia di chiavi come la G() del TDF
+
+$E(p_{k}, m):$
+- $x \leftarrow X$, $y \leftarrow F(p_{k}, x)$
+- $k \leftarrow H(x)$, $c \leftarrow E_{S}(k, m)$
+- output: $y, c$
+
+$D(s_{k}, (y, c)):$
+- $x \leftarrow F^{-1}(s_{k}, y)$
+- $k \leftarrow H(x)$, $m \leftarrow D_{S}(k, c)$
+- output: $m$
+
+Visto meglio:
+- header: $y = F(p_{k}, x)$
+- body: $c = E_{S}(H(x), m)$
+
+*Sicurezza:*
+Se ($G, F, F^{-1}$) è un TDF sicuro, ($E_{S}, D_{S}$) è una cifratura simmetrica autenticata sicura e $H: X \rightarrow K$ è un oracolo randomico, allora il sistema di cifratura a chiave pubblica (G, E, D) è sicuro CCA.
+
+*Esempio di Utilizzo Errato di un TDF:*
+Non bisogna applicare direttamente F al testo in chiaro, dato che è deterministico e quindi non sarebbe semanticamente sicuro. 
+$E(p_{k}, m):$
+- output: $F(p_{k}, m)$
+
+$D(s_{k}, c):$
+- output: $F^{-1}(s_{k}, c)$
+
+### RSA Trapdoor Permutation
+
