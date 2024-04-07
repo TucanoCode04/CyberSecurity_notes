@@ -145,4 +145,137 @@ $D(s_{k}, c):$
 - output: $F^{-1}(s_{k}, c)$
 
 ### RSA Trapdoor Permutation
+**Key Generation:**
+La funzione G() genera una coppia di chiavi $(p_{k}, s_{k})$ come segue:
+- scegli due numeri primi grandi $p, q$
+- calcola $N = pq$
+- sceglie *e* e *d* tali che $ed \equiv 1 \mod \phi(N)$, dove $\phi(N) = (p-1)(q-1)$
+- $p_{k} = (N, e)$, $s_{k} = (N, d)$
 
+**Encryption:**
+- $F(p_{k}, x) : \mathbb{Z}_{N}^{*} \rightarrow \mathbb{Z}_{N}^{*}$
+- RSA(x) = $x^{e} \mod N$
+
+**Decryption:**
+- $F^{-1}(s_{k}, y) = y^{d} \mod N$
+- $y^{d} \equiv RSA(x)^{d} \equiv x^{ed} \equiv x^{k\phi(N) + 1} \equiv (x^{\phi(N)})^{k}x \equiv x \mod N$
+
+**Esempio:**
+Bob genera una coppia di chiavi $(p_{k}, s_{k})$:
+- sceglie $p = 5, q = 11, N = 55, \phi(N) = 40$
+- sceglie $e = 3 : gcd(3, 40) = 1$
+- calcola $d = 27 : 3*27 \mod 40 \equiv 1$
+- $p_{k} = (55, 3), s_{k} = (55, 27)$
+
+Alice cifra un messaggio m = 13:
+- trova la chiave pubblica di Bob $p_{k} = (55, 3)$
+- calcola $c = m^{e} \mod N = 13^{3} \mod 55 = 52$
+- invia il ciphertext c = 52 a Bob
+
+Bob decifra il messaggio:
+- riceve il ciphertext c = 52
+- calcola $m = c^{d} \mod N = 52^{27} \mod 55 = 13$
+
+**RSA assumption:**
+L'RSA è una one-way permutation, cioè è facile calcolare RSA(x) ma è difficile calcolare x dato RSA(x) senza la chiave privata.
+$$\forall \text{ efficiente algoritmo A}: |Pr[A(N, e, y) = y^{1/e}] \leq \epsilon$$
+Dove A è un algoritmo che prende in input N, e, y e restituisce x tale che $y = x^{e} \mod N$, $y \in \mathbb{Z}_{N}^{*}$
+
+**Review RSA ISO Standard:**
+- ($E_{S}, D_{S}$) è una cifratura simmetrica autenticata
+- $H: \mathbb{Z}_{N} \rightarrow K$ è una one-way hash function, dove K è lo spazio delle chiavi di $E_{S}, D_{S}$
+- G() genera i parametri RSA: $pk = (N, e), sk = (N, d)$
+- $E(p_{k}, m):$
+    - $x \leftarrow \mathbb{Z}_{N}$ scelto casualmente
+    - $y \leftarrow RSA(x) = x^{e} \mod N$, $k \leftarrow H(x)$ 
+    - output: $y, E_{S}(k, m)$
+- $D(s_{k}, (y, c)):$
+    - output: $D_{S}(H(RSA^{-1}(y)), c) = m$
+
+**Semplice Attacco:**
+Supponiamo che la chiave di sessione da criptare sia di 64 bit: $k \in \{0,...,2^{64}\}$
+L'attaccante vede il ciphertext $c = RSA(k) = k^{e} \mod N$
+Se $k = k_1*k_2$, dove $k_1, k_2 < 2^{34}$ con probabilità $\approx 20\%$, allora $c/k_1^{e} = k_2^{e} \mod N$
+*Meet-in-the-middle attack:*
+- costruisce una tabella di $2^{34}$ valori: $c/1^{e}, c/2^{e}, ..., c/2^{34e}$ (O($2^{34}$))
+- per $k_2 = 0, 1, ..., 2^{34}$ calcola $k_2^{e} \mod N$ e cerca il valore in tabella (O($2^{34}$)) 
+- se trova un match, allora $k = k_1*k_2$
+
+Il tempo totale è $\approx 2^{40} << 2^{64}$, quindi l'attacco è fattibile.
+
+**RSA è una one-way permutation?**
+Per invertire RSA senza la chiave privata, l'attaccante deve trovare $x$ tale che $c = x^{e} \mod N$.
+*Quant'è difficile trovare la e-th root di c in $\mathbb{Z}_{N}, $\frac{c^{\frac{1}{e}}}{\sqrt[e]{c}}$?*
+Il miglior algoritmo conosciuto per trovare l'e-th root di c in $\mathbb{Z}_{N}$ è composta da due passaggi:
+- fattorizzare N in $p, q$, difficile se $N = pq$ è grande
+- calcolare la e-th root di c modulo $p, q$, facile
+
+**Come non migliorare RSA:**
+Usare una chiave segreta piccola(d $\approx 2^{128}$) per velocizzare la decifrazione($c^{d} \mod N$ = m).
+
+- Wiener: se d < N^{0.25}, allora RSA è facilmente invertibile da (N, e)
+
+**Attacco di Wiener:**
+(//TODO: vedere esempio)
+
+### RSA in Practice
+**RSA con e piccolo:**
+Se utilizzo *e* piccolo rendo la cifratura più veloce.
+- $e = 3 (gcd(3, \phi(N)) = 1)$ è il valore più piccolo possibile
+- $e = 2^{16} + 1 = 65537$ è un valore comune, il criptaggio deve fare solo 17 moltiplcazioni 
+Spesso è accompagnato da una decifratura lenta.
+
+**Key length:**
+La sicurezza di un sistema a chiave pubblica dovrebbe essere comparabile a quella di un sistema a chiave simmetrica.
+- 256 bit (AES) $\approx$ 15360 bit (RSA)
+
+**Attacchi di implementazione:**
+- timing attack: il tempo per eseguire $c^{d} \mod N$ dipende da d
+- power attack: il consumo di potenza per eseguire $c^{d} \mod N$ dipende da d
+- fault attack: un errore durante l'esecuzione di $c^{d} \mod N$ può rivelare d
+
+*Esempio di fault attack:*
+Di solito si divide il decriptaggio di un messaggio $x = c^{d} \mod N$ in due parti:
+- $x_p = c^{d} \mod p$
+- $x_q = c^{d} \mod q$
+Supponimao che avvenga un errore durante il calcolo di $x_q$, quindi:
+- l'output è $x' = c^{d} \mod p$, quindi $x'^{e} = c$ in $\mathbb{Z}_{p}$
+- l'output è $x' \neq c^{d} \mod q$, quindi $x'^{e} \neq c$ in $\mathbb{Z}_{q}$
+- $gcd(x'^{e} - c, N) = p$
+
+**RSA Key Generation Trouble:**
+Con poca entropia, la stessa p può essere generata più volte, che partendo da due dispositivi diversi con chiavi ($N_1, N_2$) posso calcolare $gcd(N_1, N_2) = p$.
+
+### Digital Signatures
+**Esempio:**
+Bob genera una coppia di chiavi $(p_{k}, s_{k})$:
+- sceglie $p = 5, q = 11, N = 55, \phi(N) = 40$
+- sceglie $e = 3 : gcd(3, 40) = 1$
+- calcola $d = 27 : 3*27 \mod 40 \equiv 1$
+- $p_{k} = (55, 3), s_{k} = (55, 27)$
+
+Bob ha un messaggio m = 19 e vuole firmarlo:
+- calcola la sua firma digitale $s = m^{d} \mod N = 19^{27} \mod 55 = 24$ utilizzando la sua chiave privata
+- appende la firma al messaggio $(m, s) = (19, 24)$
+
+Cathy, un verificatore, riceve la coppia $(m, s) = (19, 24)$:
+- trova la chiave pubblica di Bob $p_{k} = (55, 3)$
+- calcola $t = s^{e} \mod N = 24^{3} \mod 55 = 19$
+- verifica che $t = m$
+- conferma che $(m, s)$ è stato firmato da Bob
+
+*Se il documento è lungo?*
+La firma digitale viene calcolata su un hash del documento invece che sul documento stesso.
+
+*Perché la firma digitale?*
+- unforgeable: ci vuole la chiave privata per firmare
+- un-deniable: non si può negare di aver firmato
+- verificabile universalmente
+- differisce tra due messaggi diversi
+
+### Asymmetric Cryptosystems
+**ElGamal Cryptosystem:**
+Lo schema di crittografia è basatp sul protocollo Diffie-Hellman:
+- $G()$ genera una coppia di chiavi $(p_{k}, s_{k})$ come segue:
+    - sceglie un numero primo grande p
+    
