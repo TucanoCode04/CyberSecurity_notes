@@ -247,6 +247,7 @@ Supponimao che avvenga un errore durante il calcolo di $x_q$, quindi:
 Con poca entropia, la stessa p può essere generata più volte, che partendo da due dispositivi diversi con chiavi ($N_1, N_2$) posso calcolare $gcd(N_1, N_2) = p$.
 
 ### Digital Signatures
+(//TODO: vedere slide)
 **Esempio:**
 Bob genera una coppia di chiavi $(p_{k}, s_{k})$:
 - sceglie $p = 5, q = 11, N = 55, \phi(N) = 40$
@@ -276,6 +277,44 @@ La firma digitale viene calcolata su un hash del documento invece che sul docume
 ### Asymmetric Cryptosystems
 **ElGamal Cryptosystem:**
 Lo schema di crittografia è basatp sul protocollo Diffie-Hellman:
-- $G()$ genera una coppia di chiavi $(p_{k}, s_{k})$ come segue:
-    - sceglie un numero primo grande p
+- Bob: $G()$ genera una coppia di chiavi $(p_{k}, s_{k})$ come segue:
+    - sceglie un numero primo grande p e un generatore g di $\mathbb{Z}_{p}^{*}$
+    - sceglie un numero casuale $a \in [0, p-2]$
+    - calcola $A = g^{a} \mod p$
+    - $p_{k} = (p, g, A)$, $s_{k} = a$
+- Alice: $E(p_{k}, m): dove (0 <= m < n)$
+    - trova la chiave pubblica di Bob $p_{k} = (p, g, A)$
+    - sceglie un numero casuale $b \in [0, p-2]$
+    - calcola $B = g^{b} \mod p$
+    - calcola $c = m * A^{b} \mod p$
+    - invia $B, c$ a Bob
+- Bob: $D(s_{k}, (B, c)):$
+    - riceve $B, c$ da Alice
+    - usa la sua chiave privata $a$ per calcolare $m$:
+        - $x = p-1-a$
+        - $m = c * B^{x} \mod p$
+E' un sistema di crittografia randomizzato.
+Efficienza: il ciphertext è 2 volte più lungo del plaintext.
+Sicurezza: la sicurezza dipende dalla difficoltà del problema del logaritmo discreto.
+
+**Rabin Cryptosystem:**
+- Bob: $G()$ genera una coppia di chiavi $(p_{k}, s_{k})$ come segue:
+    - sceglie due numeri primi grandi $p, q$ tali che $p (mod 4) = q (mod 4) = 3$
+    - calcola $N = pq$
+    - $p_{k} = N$, $s_{k} = (p, q)$
+- Alice: $E(p_{k}, m):$
+    - trova la chiave pubblica di Bob $p_{k} = N$
+    - calcola $c = m^{2} \mod N$
+- Bob: $D(s_{k}, c):$
+    - riceve $c$ da Alice
+    - utilizza la sua chiave privata $(p, q)$ per calcolare $m$:
+        - $m_p = c^{(p+1)/4} \mod p$
+        - $m_q = c^{(q+1)/4} \mod q$
+        - trova $y_p, y_q$ tali che $y_p + p*y_q = 1$ (algoritmo di Euclide esteso)
+        - $r = (y_p*p*m_q + y_q*q*m_p) \mod N$
+        - $s = (y_p*p*m_q - y_q*q*m_p) \mod N$
+        - uno tra $r, -r, s, -s$ è $m$
+Efficienza: criptaggio più veloce di RSA.
+Sicurezza: il problema su cui si basa la sicurezza è difficile quanto la fattorizzazione di N.
+    
     
