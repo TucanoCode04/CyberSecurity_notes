@@ -37,7 +37,7 @@ Per risolvere $ax + b \equiv 0$ in $\mathbb{Z}_{N}$:
 *Applicazione: Calcolo dell'inverso:* $x*x^{p-2} \equiv 1 \rightarrow x^{-1} = x^{p-2}$
 *Applicazione: Generazione di numeri primi casuali:* 
 - vogliamo generare un numero primo p di 1024 bit($p \approx 2^{1024}$)
-- scegliamo un numero casuale $p \in \[2^{1024}, 2^{1025}-1\]$
+- scegliamo un numero casuale $p \in [2^{1024}, 2^{1025}-1]$
 - controlliamo se $2^{p-1} \equiv 1 in \mathbb{Z}_{p}$, se si allora p è primo altirmenti scegliamo un altro p.
 - la probabilità che un numero composto passi il test è $Pr[p non primo] < 2^{-60}$
 
@@ -53,14 +53,17 @@ Per $g \in \mathbb{Z}_{p}^{*}$ l'insieme $\{g^0(1), g^1, g^2, ..., g^{p-2}\}$ è
 *Definizione:* l'ordine di $g \in \mathbb{Z}_{p}^{*}$ è la grandezza di $\langle g \rangle$, denotato come $ord_{p}(g) = |\langle g \rangle| = (smallest a > 0 : g^a \equiv 1 in \mathbb{Z}_{p})$.
 - $ord_{7}(3) = 6$, $ord_{7}(2) = 3$
 
-*Teorema di Lagrange:* $\forall g \in \mathbb{Z}_{p}^{*} : ord_{p}(g) divide p-1$.
+*Teorema di Lagrange:* $\forall g \in \mathbb{Z}_{p}^{*} : ord_{p}(g) \text{ divide } p-1$.
 - $ord_{7}(3) = 6 : 6 | 7-1 = 6$, $ord_{7}(2) = 3 : 3 | 7-1 = 6$
 
 **Generalizzazione del Teorema di Fermat, Eulero:**
-*Definizione:* per un intero positivo N definiamo $\phi(N) = |\(\mathbb{Z}_{N}^{*}\)|$.
+
+*Definizione:* per un intero positivo N definiamo $\phi(N) = |(\mathbb{Z}_{N}^{*})|$.
+
 *Esempio:* 
 - $\phi(12) = |\{1, 5, 7, 11\}| = 4$, $\phi(p) = p-1$
 - per $N = p*q$ con p, q primi, $\phi(N) = N - p - q + 1 = (p-1)(q-1)$
+
 *Teorema di Eulero:* $\forall x \in \mathbb{Z}_{N}^{*} : x^{\phi(N)} \equiv 1 in \mathbb{Z}_{N}$.
 - $5^{\phi(12)} = 5^4 = 625 \equiv 1 in \mathbb{Z}_{12}$
 - è la generalizzazione del teorema di Fermat, se N è primo allora $\phi(N) = N-1$ e diventa il teorema di Fermat.
@@ -80,7 +83,7 @@ Se p è un numero primo dispari, allora $\frac{p-1}{2} + 1$ numeri in $\mathbb{Z
 **Teorema di Eulero:**
 *Teorema:* $x \in \mathbb{Z}_{p}^{*} è un quadrato residuo se e solo se x^{\frac{p-1}{2}} \equiv 1 in \mathbb{Z}_{p}$ se p è un numero primo dispari($x^{\frac{p-1}{2}}$ è detto simbolo di Legendre di x su p).
 - $in \mathbb{Z}_{11} : 1^5 = 1, 3^5 = 1, 4^5 = 1, 5^5 = 1, 9^5 = 1$
-*Nota:* con $x \neq 0$ ho che $x^{\frac{p-1}{2}} \equiv x^{(p-1)}^{1/2} \equiv 1^{1/2} \in \{1, -1\} \in \mathbb{Z}_{p}$
+*Nota:* con $x \neq 0$ ho che $x^{\frac{p-1}{2}} \equiv x^{(p-1)^{1/2}} \equiv 1^{1/2} \in \{1, -1\} \in \mathbb{Z}_{p}$
 
 **Equazioni quadratiche:**
 *Lemma:* se $c \in \mathbb{Z}_{p}^{*}$ è un quadrato residuo, allora $\sqrt{c} = c^{\frac{p+1}{4}} in \mathbb{Z}_{p}$.

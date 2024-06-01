@@ -149,7 +149,7 @@ $D(s_{k}, c):$
 La funzione G() genera una coppia di chiavi $(p_{k}, s_{k})$ come segue:
 - scegli due numeri primi grandi $p, q$
 - calcola $N = pq$
-- sceglie *e* e *d* tali che $ed \equiv 1 \mod \phi(N)$, dove $\phi(N) = (p-1)(q-1)$
+- sceglie *e*( tale che $gcd(e, \phi(N) = 1)$) e *d* tali che $ed \equiv 1 \mod \phi(N)$, dove $\phi(N) = (p-1)(q-1)$
 - $p_{k} = (N, e)$, $s_{k} = (N, d)$
 
 **Encryption:**
@@ -205,7 +205,7 @@ Il tempo totale è $\approx 2^{40} << 2^{64}$, quindi l'attacco è fattibile.
 
 **RSA è una one-way permutation?**
 Per invertire RSA senza la chiave privata, l'attaccante deve trovare $x$ tale che $c = x^{e} \mod N$.
-*Quant'è difficile trovare la e-th root di c in $\mathbb{Z}_{N}, $\frac{c^{\frac{1}{e}}}{\sqrt[e]{c}}$?*
+*Quant'è difficile trovare la e-th root di c in* $\mathbb{Z}_{N}, \frac{c^{\frac{1}{e}}}{\sqrt[e]{c}}$*?*
 Il miglior algoritmo conosciuto per trovare l'e-th root di c in $\mathbb{Z}_{N}$ è composta da due passaggi:
 - fattorizzare N in $p, q$, difficile se $N = pq$ è grande
 - calcolare la e-th root di c modulo $p, q$, facile
